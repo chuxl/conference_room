@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="main.com.em.dao.RoomMapper">
+    <select id="roomCount" resultType="int">
+        SELECT count(*) FROM room
+    </select>
+
+    <select id="findByPaging" parameterType="main.com.em.domain.PagingVO" resultType="main.com.em.domain.Room">
+        SELECT * FROM room
+        limit #{toPageNo}, #{pageSize}
+    </select>
+
+    <insert id="add" parameterType="main.com.em.domain.Room">
+        INSERT INTO room VALUES(null,#{name},#{message})
+    </insert>
+
+    <select id="findById" parameterType="int" resultType="main.com.em.domain.Room">
+        SELECT * FROM room WHERE id=#{id}
+    </select>
+
+    <select id="findByName" parameterType="java.lang.String" resultType="main.com.em.domain.Room">
+        SELECT * FROM room
+        <where>
+            <!--对于拼接符${},如果仅传入一个类型为String的参数(注意是只有一个参数)，那么在${}中参数名称必须使用value或_parameter来代替-->
+            <if test="value!=null and value!=''">
+                AND name LIKE '%${value}%'
+            </if>
+        </where>
+    </select>
+    <!--获取所有会议室的名字-->
+    <select id="nameList" resultType="main.com.em.domain.Room">
+        SELECT a.name FROM room a
+    </select>
+
+    <update id="updateById" parameterType="main.com.em.domain.Room">
+        UPDATE room
+        <set>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="message!=null and message!=''">
+                message=#{message},
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <update id="removeById" parameterType="int">
+        DELETE FROM room WHERE id=#{id}
+    </update>
+</mapper>

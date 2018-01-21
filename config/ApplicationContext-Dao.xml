@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--加载配置文件-->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!--使用bean标签  id必须唯一  class后面加的是具体的实现类(不是接口)的全路径-->
+    <!--Druid连接池配置-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--整合后会话工厂归Spring管理-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--指定Mybatis核心配置文件-->
+        <property name="configLocation" value="classpath:SqlMapConfig.xml"/>
+        <!--指定会话工厂使用的数据库连接池-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--Mapper接口代理(动态代理)方式实现Spring-Mybatis整合-->
+    <!--使用包扫描的方式批量实现代理
+        扫描后可以使用类名首字母小写进行引用-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--指定需要扫描的包的全路径名称，如果有多个包，用英文输入法状态下的逗号分隔。-->
+        <property name="basePackage" value="main.com.em.dao"/>
+    </bean>
+</beans>

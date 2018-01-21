@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="main.com.em.dao.ReservationMapper">
+    <select id="reservationCount" resultType="int">
+        SELECT count(*) FROM reservation a WHERE date>CURDATE() AND a.mark='待审核'
+    </select>
+
+    <select id="reserveCount" resultType="int">
+        SELECT count(*) FROM reservation a WHERE date>CURDATE() AND mark!='取消申请'
+    </select>
+
+    <select id="findByPaging" parameterType="main.com.em.domain.PagingVO" resultType="main.com.em.domain.ReservationVo">
+        SELECT a.id,b.`name` ,a.date,a.begintime,a.endtime,a.`user`,a.mobile,a.mark FROM reservation a
+        LEFT JOIN room b on a.room_id=b.id
+        WHERE date>CURDATE() AND a.mark='待审核' ORDER BY id
+        limit #{toPageNo}, #{pageSize}
+    </select>
+
+    <select id="findAllByPaging" parameterType="main.com.em.domain.PagingVO" resultType="main.com.em.domain.ReservationVo">
+        SELECT a.id,b.`name` ,a.date,a.begintime,a.endtime,a.`user`,a.mobile,a.mark FROM reservation a
+        LEFT JOIN room b on a.room_id=b.id
+        WHERE date>CURDATE() AND mark!='取消申请' ORDER BY date DESC
+        limit #{toPageNo}, #{pageSize}
+    </select>
+
+    <select id="findByName" parameterType="string" resultType="main.com.em.domain.ReservationVo">
+        SELECT a.id,b.`name` ,a.date,a.begintime,a.endtime,a.`user`,a.mobile,a.mark FROM reservation a
+        LEFT JOIN room b on a.room_id=b.id
+        WHERE date>CURDATE() AND a.mark='待审核' AND a.user LIKE '%${value}%' ORDER BY id
+    </select>
+
+    <select id="reservationPassCount" resultType="int">
+        SELECT count(*) FROM reservation a WHERE date BETWEEN CURDATE()-30 AND CURDATE() AND a.mark='审核通过' ORDER BY date DESC
+    </select>
+
+    <select id="findRecord" parameterType="main.com.em.domain.PagingVO" resultType="main.com.em.domain.ReservationVo">
+        SELECT a.id,b.`name` ,a.date,a.begintime,a.endtime,a.`user`,a.mobile,a.mark FROM reservation a
+        LEFT JOIN room b on a.room_id=b.id
+        WHERE date BETWEEN CURDATE()-30 AND CURDATE() AND a.mark='审核通过' ORDER BY id
+        limit #{toPageNo}, #{pageSize}
+    </select>
+
+    <select id="queryByUser" parameterType="string" resultType="main.com.em.domain.ReservationVo">
+        SELECT a.id,b.`name` ,a.date,a.begintime,a.endtime,a.`user`,a.mobile,a.mark FROM reservation a
+        LEFT JOIN room b on a.room_id=b.id
+        WHERE date>CURDATE() AND a.user LIKE '%${value}%' ORDER BY date DESC
+    </select>
+
+    <update id="reviewReservation" parameterType="int">
+        UPDATE reservation SET mark='审核通过' WHERE id=#{id}
+    </update>
+
+    <insert id="addReservation" parameterType="main.com.em.domain.ReservationCustom">
+        INSERT INTO reservation(user,mobile,date,begintime,endtime,mark,room_id)
+        SELECT #{user},#{mobile},#{date},#{beginTime},#{endTime},'待审核',id FROM room WHERE name=#{name}
+    </insert>
+
+    <select id="findByUser" parameterType="string" resultType="main.com.em.domain.ReservationCustom">
+        SELECT a.id,b.name,a.user,a.date,a.begintime,a.endtime,a.mark FROM reservation a
+        LEFT JOIN room b ON a.room_id=b.id
+        WHERE a.date > CURDATE()-15  AND a.mark='待审核' AND a.user=#{value} ORDER BY a.date DESC
+    </select>
+
+    <update id="cancelApplication" parameterType="int">
+        UPDATE reservation SET mark='取消申请' where id=#{id}
+    </update>
+</mapper>
