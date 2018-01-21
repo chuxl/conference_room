@@ -6,3 +6,4 @@ sql:数据库SQL文件，只存放表结构，数据没有包含在内。
 src:源码文件夹。
 config:配置文件。
 注意src和config都是Sources Folder。
+本项目采用maven管理项目，如果项目运行报Spring错，请检查自己maven导入jar中是否有个Maven:org.springframework: spring-2.5.6.SEC03.jar，如果有，删之。
