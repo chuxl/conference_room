@@ -184,7 +184,9 @@ public class AdminController {
 
     @RequestMapping(value = "/userRegister",method = RequestMethod.POST)
     public String userRegister(User user) throws Exception{
-        userService.addNewUser(user);
+         if(user.getId()!=null && user.getId()!="" && user.getPassword()!=null && user.getPassword()!=""){
+            userService.addNewUser(user);
+        }
         return "redirect:/admin/userRegister";
     }
 }
